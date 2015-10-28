@@ -111,7 +111,7 @@ void make_heap(int* tab, unsigned n)
 
 void build_heap(int* tab, unsigned n)
 {
-	for (int i = n/2; i >= 1; i--)
+	for (int i = n/2 -1; i >= 0; i--)
 	{
 		heapify(tab, n, i);
 	}
@@ -121,15 +121,21 @@ void build_heap(int* tab, unsigned n)
 void heapify(int* tab, unsigned n, unsigned pos)
 {
 	int leftc = 2 * pos;
-	int	rightc = 2 * pos + 1;
-	int largest_nb = pos;
+	int	rightc = 2 * pos;
+	unsigned largest_nb = 0;
 
-	if (leftc <= n && tab[largest_nb] < tab[leftc])
+//printf("yolo\n");
+	if (leftc <= n && tab[pos] < tab[leftc])
 	{
 		largest_nb = leftc;
+		printf("%i\n", largest_nb);
 	}
+	else
+	largest_nb = pos;
+	
   if (rightc <= n && tab[largest_nb] < tab[rightc])
 	{
+		printf("%i\n", largest_nb);
 		largest_nb = rightc;
 	}
 	
