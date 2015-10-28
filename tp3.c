@@ -5,6 +5,8 @@
 #include <assert.h> 
 #include <time.h>
 #include <string.h> 
+#include <stdbool.h>
+
 
 void make_heap(int* tab, unsigned n);
 void heapify(int* tab, unsigned n, unsigned pos);
@@ -97,7 +99,7 @@ void print_int_array(FILE* out, const int* tab, unsigned count)
 //-------------print_int_array------------------------------
 
 //-------------make_heap------------------------------------
-void make_heap(int* tab, unsigned n)
+/*void make_heap(int* tab, unsigned n)
 {
 	build_heap(tab, n);
 	for(int i = n; i >= 2; i--)
@@ -107,11 +109,11 @@ void make_heap(int* tab, unsigned n)
     tab[1] = temp;
     heapify(tab, i-1, 1);
   }
-}
+}*/
 
-void build_heap(int* tab, unsigned n)
+void make_heap(int* tab, unsigned n)
 {
-	for (int i = n/2 -1; i >= 0; i--)
+	for (int i = n/2; i >= 0; i--)
 	{
 		heapify(tab, n, i);
 	}
@@ -120,22 +122,22 @@ void build_heap(int* tab, unsigned n)
 //n ==> length; pos == position (i in make_heap)
 void heapify(int* tab, unsigned n, unsigned pos)
 {
-	int leftc = 2 * pos;
-	int	rightc = 2 * pos;
+	int leftc = 2 * pos +1;
+	int	rightc = 2 * pos + 2;
 	unsigned largest_nb = 0;
 
 //printf("yolo\n");
-	if (leftc <= n && tab[pos] < tab[leftc])
+	if (leftc < n && tab[pos] < tab[leftc])
 	{
 		largest_nb = leftc;
-		printf("%i\n", largest_nb);
+		//printf("%i\n", largest_nb);
 	}
 	else
 	largest_nb = pos;
 	
-  if (rightc <= n && tab[largest_nb] < tab[rightc])
+  if (rightc < n && tab[largest_nb] < tab[rightc])
 	{
-		printf("%i\n", largest_nb);
+//		printf("%i\n", largest_nb);
 		largest_nb = rightc;
 	}
 	
@@ -152,17 +154,64 @@ void heapify(int* tab, unsigned n, unsigned pos)
 		tab[pos] = temp;
 		
 		heapify(tab, n, largest_nb);
-
 	}
 }
 
 //------------make_heap------------------------------------
 
+//------------check_heap------------------------------------
+
+bool check_heap(int* heap, unsigned n)
+{
+//int leftc = 0;
+//int rightc = 0;
+	
+	for (int i = n/2; i >= 1; i--)
+	{
+		//printf("i is %i\n", i);
+		//leftc = 2i;
+		//rightc = 2i+1;
+		//printf("left:%i rignt:%i\n", leftc, rightc);
+		if ( n != 0 && heap[i] >= heap[2 * i + 1])	
+		{
+		//	printf("%i\n", leftc);
+			i = i / 2 +1;
+		} 
+		else
+			return false;
+
+		if(n != 0 && heap[i] >= heap[2 * i + 2])
+		{
+			i = i / 2 + 2;
+		}
+		else 
+			return false;
+	}
+return true;
+}
+
+//------------check_heap------------------------------------
+
+
 int main(void)
 {
+/*
 int a[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
 unsigned asize = sizeof(a) / sizeof(*a);
 make_heap(a, asize);
 puts("output:");
 print_int_array(stdout, a, asize);
+*/
+
+
+//test for check heap---------------
+int a[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
+unsigned asize = sizeof(a) / sizeof(*a);
+printf("input is %sa heap\n", check_heap(a, asize) ? "" : "not ");
+make_heap(a, asize);
+printf("output is %sa heap\n", check_heap(a, asize) ? "" : "not ");
+//-------------------------------------------
+
+
+return 0;
 }
