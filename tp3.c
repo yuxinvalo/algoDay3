@@ -11,7 +11,7 @@
 void make_heap(int* tab, unsigned n);
 void heapify(int* tab, unsigned n, unsigned pos);
 void build_heap(int* tab, unsigned n);
-
+void print_space(FILE* out, int space, int space_p, int max_size);
 
 //-------------print_int_array------------------------------
 unsigned int_width(double i)
@@ -94,6 +94,22 @@ void print_int_array(FILE* out, const int* tab, unsigned count)
   }
 }
 
+void insert_sort(int* tab, unsigned count)
+{
+int i, j;
+int temp;
+
+  for(i = 0; i < count; ++i)
+  {
+      temp = *(tab + i);
+      for (j = i; j > 0 && *(tab + j - 1) > temp; j--)
+      {
+        *(tab + j) = *(tab + j - 1);
+      }
+      *(tab + j) = temp;
+  }
+}
+
 
 
 //-------------print_int_array------------------------------
@@ -163,28 +179,11 @@ void heapify(int* tab, unsigned n, unsigned pos)
 
 bool check_heap(int* heap, unsigned n)
 {
-//int leftc = 0;
-//int rightc = 0;
-	
-	for (int i = n/2; i >= 1; i--)
+	for (int i = 0; i < n / 2; i++)
 	{
-		//printf("i is %i\n", i);
-		//leftc = 2i;
-		//rightc = 2i+1;
-		//printf("left:%i rignt:%i\n", leftc, rightc);
-		if ( n != 0 && heap[i] >= heap[2 * i + 1])	
-		{
-		//	printf("%i\n", leftc);
-			i = i / 2 +1;
-		} 
-		else
+		if ( n != 0 && heap[i] < heap[2 * i + 1])	
 			return false;
-
-		if(n != 0 && heap[i] >= heap[2 * i + 2])
-		{
-			i = i / 2 + 2;
-		}
-		else 
+		else if(n != 0 && heap[i] < heap[2 * i + 2])
 			return false;
 	}
 return true;
@@ -193,6 +192,95 @@ return true;
 //------------check_heap------------------------------------
 
 
+//-------------pretty print heap-----------------------------
+void pretty_print_heap(FILE* out, const int* v, int n)
+{
+	int depth = 0 - 1;
+	int max_size = ints_width(v,n);
+	//make_heap((int*)v, n);
+	//this "for" is used for \n
+	for (int i = 0; i < n; i = 2 * i + 1)
+	{
+		depth++;
+		//printf("depth is %i\n", depth);
+	}
+	
+	//size of last line
+	int t = (ints_width(v,n) + 1) * pow(2, depth);
+	//printf("%i\n", t);	
+
+	for(int i = 0; i < n; i++)
+	{
+		int c = i + 1;
+		int space = t / c - max_size;
+    print_space(out, space, int_width(v[i]), max_size);
+		/*for (int i = 0; i < padding_space + max_side - int_width(v[i]); i++)
+			fprintf(out, " ");*/
+		fprintf(out, "%i", v[i]);
+		
+		//control the line: index + 1 <= 2 ^ depth - 1 
+		int j = 0;	
+		for(j = i; j < 2 * i && j < n - 1 ; j++)
+		{
+			print_space(out, space * 2, int_width(v[j+1]), max_size);
+			fprintf(out,"%i", v[j + 1]);
+		}
+	//change line
+	i = j; 	
+	fprintf(out,"\n");
+	}
+}
+void print_space(FILE* out, int space, int space_p, int max_size)
+
+{
+	int padding_space = space / 2;
+	//printf("padding_space is %i\n", padding_space);
+	for (int i = 0; i < padding_space + max_size - space_p; i++)
+	{
+		//printf("dddd");
+		fprintf(out," ");
+	}	
+}
+
+//-------------pretty print heap-----------------------------
+
+//--------------pop_heap------------------------------------
+int pop_heap(int* heap, unsigned* n)
+{
+	int ret = heap[0];
+	int size = *n;
+	int i = 0;
+
+	while (i * 2 + 1 <= size)
+	{
+		int a = i * 2 + 1;
+		int b = i * 2 + 2;
+		if (b < size && heap[b] < heap[a])
+		{
+			a = b;
+		}
+	
+		if (heap[a] >= size)
+		{break;}
+		
+		heap[i] = heap[a];
+		i = a;
+	}
+	heap[i] = size;
+	return ret;
+}
+
+//--------------pop_heap------------------------------------
+
+
+//-------------heap_sort-------------------------------------
+void heap_sort(int* tab, unsigned n)
+{
+	make_heap(tab, n);
+  insert_sort(tab, n);
+}
+
+//-------------heap_sort-------------------------------------
 int main(void)
 {
 /*
@@ -204,13 +292,50 @@ print_int_array(stdout, a, asize);
 */
 
 
-//test for check heap---------------
+/*test for check heap---------------
 int a[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
 unsigned asize = sizeof(a) / sizeof(*a);
 printf("input is %sa heap\n", check_heap(a, asize) ? "" : "not ");
 make_heap(a, asize);
 printf("output is %sa heap\n", check_heap(a, asize) ? "" : "not ");
-//-------------------------------------------
+//-------------------------------------------*/
+
+/*test for pretty tree----------------------------
+
+int a[] = { 16, 2, -3, 42, 54, 65, 73, 8, 90, 10, 11, 12, 13 };
+unsigned asize = sizeof(a) / sizeof(*a);
+make_heap(a, asize);
+puts("Look Ma! I drew a tree!");
+pretty_print_heap(stdout, a, asize);
+//test for pretty tree----------------------------*/
+
+//test for pop_heap---------------------------------
+int a[] = { 123, 0, 33, 42, 544, 165, -73, 228 };
+unsigned asize = sizeof(a) / sizeof(*a);
+make_heap(a, asize);
+puts("init");
+pretty_print_heap(stdout, a, asize);
+for (unsigned i = 0; i < 5; ++i)
+  {
+     printf("pop_heap() == %d\n", pop_heap(a, &asize));
+     pretty_print_heap(stdout, a, asize);
+  }
+
+
+
+
+//test for pop_heap---------------------------------
+
+
+/*test for heap sorted-------------------------------
+int a[] = { 123, 0, 33, 42, 544, 165, -73, 228, -99, -10, -11, 912, -13, 12, 345 };
+unsigned asize = sizeof(a) / sizeof(*a);
+puts("before");
+print_int_array(stdout, a, asize);
+heap_sort(a, asize);
+puts("after");
+print_int_array(stdout, a, asize);
+//test for heap sorted-------------------------------*/
 
 
 return 0;
